@@ -1,0 +1,34 @@
+require("dotenv").config();
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: (process.env.EMAIL_PASSWORD || "").replace(/\s+/g, "")
+    }
+});
+
+async function sendEmail({ to, subject, text, html }) {
+    try {
+        const info = await transporter.sendMail({
+            from: `"YumZilla" <${process.env.EMAIL_USER}>`,
+            to,
+            subject,
+            text,
+            html
+        });
+        console.log("Email sent successfully:", info.messageId);
+        return info;
+    } catch (error) {
+        console.error("Error in sending mail:", error);
+        throw error;
+    }
+}
+
+sendEmail.sendEmail = sendEmail;
+sendEmail.sendMail = sendEmail;
+sendEmail.transporter = transporter;
+
+module.exports = sendEmail;
+
