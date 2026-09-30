@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import api from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
+import { useOwnerOrders } from "../../hooks/useOwnerOrders";
 import { PageHeader } from "../../components/ui/PageHeader";
 import { Button } from "../../components/ui/Button";
 import { StatusPill } from "../../components/ui/StatusPill";
@@ -29,25 +30,22 @@ export const OwnerDashboard = () => {
     queryKey: ["owner-restaurants"],
     queryFn: async () => {
       const response = await api.get("/restaurants?limit=100");
-      // Find restaurants where owner is current user
       const list = response.data?.restaurants || [];
-      return list.filter((r) => (r.owner?._id || r.owner) === user?._id);
+      return list.filter((r) => {
+        const ownerId = r.owner?._id?.toString() || r.owner?.toString() || r.owner;
+        const currentUserId = user?._id?.toString() || user?.id?.toString();
+        return ownerId === currentUserId;
+      });
     },
-    enabled: !!user?._id,
+    enabled: !!user?._id || !!user?.id,
   });
 
   const restaurants = restData || [];
   const primaryRestaurant = restaurants[0];
 
-  // 2. Fetch owner's live orders
-  const { data: ordersData, isLoading: loadingOrders } = useQuery({
-    queryKey: ["owner-orders", { restaurantId: primaryRestaurant?._id }],
-    queryFn: async () => {
-      const response = await api.get("/orders/restaurant?limit=100");
-      return response.data?.orders || [];
-    },
-    enabled: !!primaryRestaurant?._id,
-  });
+  // 2. Fetch owner's live orders with real-time socket subscription
+  const { data: ordersResult, isLoading: loadingOrders } = useOwnerOrders(primaryRestaurant?._id);
+  const orders = ordersResult?.orders || [];
 
   // Toggle open/closed status
   const toggleStatusMutation = useMutation({
@@ -66,7 +64,6 @@ export const OwnerDashboard = () => {
     },
   });
 
-  const orders = ordersData || [];
   const activeOrders = orders.filter(
     (o) => o.status !== "DELIVERED" && o.status !== "CANCELLED"
   );

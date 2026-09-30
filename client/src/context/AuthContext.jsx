@@ -13,7 +13,8 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get("/users/me");
       if (response.data) {
         setUser(response.data);
-        connectSocket();
+        const storedToken = localStorage.getItem("accessToken");
+        connectSocket(storedToken);
       } else {
         setUser(null);
       }
@@ -32,6 +33,9 @@ export const AuthProvider = ({ children }) => {
     const response = await api.post("/users/login", { email, password });
     if (response.data?.user) {
       setUser(response.data.user);
+      if (response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+      }
       connectSocket(response.data.accessToken);
     }
     return response.data;
@@ -46,6 +50,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post("/users/logout");
     } finally {
+      localStorage.removeItem("accessToken");
       setUser(null);
       disconnectSocket();
     }

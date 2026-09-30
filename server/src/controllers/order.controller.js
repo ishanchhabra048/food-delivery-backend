@@ -492,7 +492,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     order.status = status;
     await order.save();
 
-    // Emit Socket.IO event
+    // Emit Socket.IO event to order room, restaurant room, and customer user room
     const io = req.app.get("io");
     if (io) {
         io.to(`order:${order._id}`).emit("order:status", {
@@ -502,7 +502,13 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         });
         io.to(`restaurant:${order.restaurant}`).emit("order:status", {
             orderId: order._id,
-            status: order.status
+            status: order.status,
+            updatedAt: order.updatedAt
+        });
+        io.to(`user:${order.user}`).emit("order:status", {
+            orderId: order._id,
+            status: order.status,
+            updatedAt: order.updatedAt
         });
     }
 

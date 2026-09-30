@@ -15,12 +15,25 @@ export const getSocket = () => {
       }
     }
 
+    const token = localStorage.getItem("accessToken");
+
     socketInstance = io(serverUrl, {
       withCredentials: true,
       autoConnect: false,
+      auth: { token },
+      query: { token },
       transports: ["websocket", "polling"],
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       reconnectionDelay: 1000,
+      timeout: 20000,
+    });
+
+    socketInstance.on("connect_error", (err) => {
+      console.warn("Socket connect_error:", err.message);
+    });
+
+    socketInstance.on("connect", () => {
+      console.log("⚡ Socket.IO connected successfully to", serverUrl);
     });
   }
   return socketInstance;
@@ -28,8 +41,10 @@ export const getSocket = () => {
 
 export const connectSocket = (token) => {
   const socket = getSocket();
-  if (token) {
-    socket.auth = { token };
+  const actualToken = token || localStorage.getItem("accessToken");
+  if (actualToken) {
+    socket.auth = { token: actualToken };
+    socket.io.opts.query = { token: actualToken };
   }
   if (!socket.connected) {
     socket.connect();
