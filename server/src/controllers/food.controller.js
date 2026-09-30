@@ -22,7 +22,8 @@ const createFood = asyncHandler(async (req, res) => {
         description,
         price,
         category,
-        restaurantId
+        restaurantId,
+        image
     } = req.body;
 
     // 2. Validate
@@ -51,12 +52,15 @@ const createFood = asyncHandler(async (req, res) => {
         );
     }
 
+    const formattedImage = typeof image === "string" ? { url: image, publicId: "" } : (image || { url: "", publicId: "" });
+
     // 5. Create food
     const food = await Food.create({
         name,
         description,
         price,
         category,
+        image: formattedImage,
         restaurant: restaurantId
     });
 
@@ -265,6 +269,7 @@ const updateFood = asyncHandler(async (req, res) => {
         description,
         price,
         category,
+        image,
         isAvailable
     } = req.body;
 
@@ -304,19 +309,24 @@ const updateFood = asyncHandler(async (req, res) => {
         );
     }
 
+    const updateFields = {
+        name,
+        description,
+        price,
+        category,
+        isAvailable
+    };
+
+    if (image !== undefined) {
+        updateFields.image = typeof image === "string" ? { url: image, publicId: "" } : image;
+    }
 
     // 4. Update food
     const updatedFood =
         await Food.findByIdAndUpdate(
             id,
             {
-                $set: {
-                    name,
-                    description,
-                    price,
-                    category,
-                    isAvailable
-                }
+                $set: updateFields
             },
             {
                 new: true

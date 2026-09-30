@@ -30,8 +30,13 @@ const createFoodSchema = z.object({
         .regex(objectIdRegex, "Invalid restaurant ID format"),
 
     image: z
-        .string()
-        .trim()
+        .union([
+            z.string(),
+            z.object({
+                url: z.string().optional().default(""),
+                publicId: z.string().optional().default("")
+            })
+        ])
         .optional(),
 
     isAvailable: z
@@ -67,8 +72,13 @@ const updateFoodSchema = z.object({
         .optional(),
 
     image: z
-        .string()
-        .trim()
+        .union([
+            z.string(),
+            z.object({
+                url: z.string().optional().default(""),
+                publicId: z.string().optional().default("")
+            })
+        ])
         .optional(),
 
     isAvailable: z

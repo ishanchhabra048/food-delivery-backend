@@ -1,12 +1,13 @@
+require("dotenv").config();
 const { Worker } = require("bullmq");
-
 const bullmqConnection = require("../config/bullmq");
 const sendEmail = require("../utils/sendEmail");
+const logger = require("../utils/logger");
 
 const emailWorker = new Worker(
     "emailQueue",
     async (job) => {
-        console.log("Processing email job:", job.id);
+        logger.info({ jobId: job.id }, "Processing email job");
 
         const { to, subject, text, html } = job.data;
 
@@ -17,7 +18,7 @@ const emailWorker = new Worker(
             html
         });
 
-        console.log("Email sent successfully");
+        logger.info({ jobId: job.id, to }, "Email sent successfully");
     },
     {
         connection: bullmqConnection
@@ -25,14 +26,13 @@ const emailWorker = new Worker(
 );
 
 emailWorker.on("completed", (job) => {
-    console.log(`Email job ${job.id} completed`);
+    logger.info({ jobId: job.id }, "Email job completed");
 });
 
 emailWorker.on("failed", (job, err) => {
-    console.error(
-        `Email job ${job?.id} failed:`,
-        err.message
-    );
+    logger.error({ jobId: job?.id, error: err.message }, "Email job failed");
 });
 
-console.log("Email worker is running...");
+logger.info("Email worker is running...");
+
+module.exports = emailWorker;

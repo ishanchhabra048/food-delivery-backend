@@ -9,7 +9,8 @@ const foodSchema = new mongoose.Schema(
         },
 
         description: {
-            type: String
+            type: String,
+            trim: true
         },
 
         price: {
@@ -19,11 +20,13 @@ const foodSchema = new mongoose.Schema(
 
         category: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
 
         image: {
-            type: String
+            url: { type: String, default: "" },
+            publicId: { type: String, default: "" }
         },
 
         restaurant: {

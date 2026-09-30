@@ -4,6 +4,12 @@ const ApiResponse = require("../utils/ApiResponse");
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+});
+
 const registerUser = asyncHandler(async(req,res)=>{
   const {fullName, name, email, password, phoneNumber, role} = req.body;
   const actualFullName = fullName || name;
@@ -56,10 +62,7 @@ const loginUser = asyncHandler(async(req,res)=>{
     .select("-password -refreshToken");
 
 
-  const options = {
-      httpOnly: true,
-      secure: false
-  };
+  const options = getCookieOptions();
 
   return res
       .status(200)
@@ -91,10 +94,7 @@ const logoutUser = asyncHandler(async (req, res) => {
       new:true
     }
   );
-  const options = {
-    httpOnly:true,
-    secure:false
-  };
+  const options = getCookieOptions();
   return res
   .status(200)
   .clearCookie("accessToken", options)
@@ -156,10 +156,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     });
 
     // 3. Send new tokens through cookies
-    const options = {
-        httpOnly: true,
-        secure: false
-    };
+    const options = getCookieOptions();
 
     return res
         .status(200)

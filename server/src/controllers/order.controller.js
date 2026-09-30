@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
@@ -113,25 +114,82 @@ const createOrder = asyncHandler(async (req, res) => {
     const totalAmount =
         itemTotal + deliveryFee + tax;
 
-    // 12. Create order
-    const order = await Order.create({
-        user: req.user._id,
-        restaurant: restaurantId,
+    // 12. Transactional Order Creation & Cart Clearing
+    let session = null;
+    let order;
 
-        items: orderItems,
+    try {
+        session = await mongoose.startSession();
+        session.startTransaction();
 
-        itemTotal,
-        deliveryFee,
-        tax,
-        totalAmount,
+        const createdOrders = await Order.create([
+            {
+                user: req.user._id,
+                restaurant: restaurantId,
+                items: orderItems,
+                itemTotal,
+                deliveryFee,
+                tax,
+                totalAmount,
+                address: address._id,
+                deliveryAddress: formatAddress(address)
+            }
+        ], { session });
 
-        address: address._id,
-        deliveryAddress: formatAddress(address)
-    });
+        order = createdOrders[0];
 
-    // 13. Clear cart after order creation
-    cart.items = [];
-    await cart.save();
+        // Clear cart after order creation
+        cart.items = [];
+        await cart.save({ session });
+
+        await session.commitTransaction();
+    } catch (error) {
+        if (session) {
+            try {
+                await session.abortTransaction();
+            } catch (_) {}
+        }
+
+        // Fallback for standalone/in-memory Mongo instances without replica set
+        try {
+            order = await Order.create({
+                user: req.user._id,
+                restaurant: restaurantId,
+                items: orderItems,
+                itemTotal,
+                deliveryFee,
+                tax,
+                totalAmount,
+                address: address._id,
+                deliveryAddress: formatAddress(address)
+            });
+
+            cart.items = [];
+            await cart.save();
+        } catch (fallbackError) {
+            throw error;
+        }
+    } finally {
+        if (session) {
+            try {
+                await session.endSession();
+            } catch (_) {}
+        }
+    }
+
+    // Emit Socket.IO event to restaurant owner room
+    const io = req.app.get("io");
+    if (io) {
+        try {
+            const populatedOrder = await Order.findById(order._id)
+                .populate("user", "fullName email phoneNumber")
+                .populate("restaurant", "name")
+                .populate("items.food", "name price image");
+            io.to(`restaurant:${restaurantId}`).emit("order:new", populatedOrder || order);
+        } catch (socketErr) {
+            console.error("Socket emit error on createOrder:", socketErr.message);
+        }
+    }
 
     // 14. Send response
     return res.status(201).json(
@@ -166,8 +224,8 @@ const getMyOrders = asyncHandler(async (req, res) => {
     const [totalDocs, orders] = await Promise.all([
         Order.countDocuments(filter),
         Order.find(filter)
-            .populate("items.food", "name price")
-            .populate("restaurant", "name")
+            .populate("items.food", "name price image")
+            .populate("restaurant", "name image")
             .populate("address")
             .sort(sort)
             .skip(skip)
@@ -191,16 +249,40 @@ const getMyOrders = asyncHandler(async (req, res) => {
 // ==================== GET ORDER BY ID ====================
 
 const getOrderById = asyncHandler(async (req, res) => {
-
     const { id } = req.params;
 
-    const order = await Order.findOne({
-        _id: id,
-        user: req.user._id
-    })
-        .populate("restaurant", "name address")
-        .populate("items.food", "name price")
-        .populate("address");
+    // Check if requester is customer, restaurant owner, or admin
+    let order;
+    if (req.user.role === "admin") {
+        order = await Order.findById(id)
+            .populate("restaurant", "name address image")
+            .populate("items.food", "name price image")
+            .populate("address")
+            .populate("user", "fullName email phoneNumber");
+    } else if (req.user.role === "restaurantOwner") {
+        order = await Order.findById(id)
+            .populate("restaurant", "name address image")
+            .populate("items.food", "name price image")
+            .populate("address")
+            .populate("user", "fullName email phoneNumber");
+        
+        if (order) {
+            const restaurant = await Restaurant.findById(order.restaurant?._id || order.restaurant);
+            if (!restaurant || restaurant.owner.toString() !== req.user._id.toString()) {
+                if (order.user?._id?.toString() !== req.user._id.toString()) {
+                    throw new ApiError(403, "You are not authorized to view this order");
+                }
+            }
+        }
+    } else {
+        order = await Order.findOne({
+            _id: id,
+            user: req.user._id
+        })
+            .populate("restaurant", "name address image")
+            .populate("items.food", "name price image")
+            .populate("address");
+    }
 
     if (!order) {
         throw new ApiError(404, "Order not found");
@@ -219,7 +301,6 @@ const getOrderById = asyncHandler(async (req, res) => {
 // ==================== CANCEL ORDER ====================
 
 const cancelOrder = asyncHandler(async (req, res) => {
-
     const { id } = req.params;
 
     const order = await Order.findOne({
@@ -243,8 +324,21 @@ const cancelOrder = asyncHandler(async (req, res) => {
     }
 
     order.status = "CANCELLED";
-
     await order.save();
+
+    // Emit Socket.IO event
+    const io = req.app.get("io");
+    if (io) {
+        io.to(`order:${order._id}`).emit("order:status", {
+            orderId: order._id,
+            status: order.status,
+            updatedAt: order.updatedAt
+        });
+        io.to(`restaurant:${order.restaurant}`).emit("order:status", {
+            orderId: order._id,
+            status: order.status
+        });
+    }
 
     return res.status(200).json(
         new ApiResponse(
@@ -275,9 +369,15 @@ const getRestaurantOrders = asyncHandler(async (req, res) => {
     });
 
     if (restaurants.length === 0) {
-        throw new ApiError(
-            404,
-            "Restaurant not found"
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                "Restaurant orders fetched successfully",
+                {
+                    orders: [],
+                    pagination: buildPaginationResponse(0)
+                }
+            )
         );
     }
 
@@ -308,7 +408,7 @@ const getRestaurantOrders = asyncHandler(async (req, res) => {
             )
             .populate(
                 "items.food",
-                "name price"
+                "name price image"
             )
             .sort(sort)
             .skip(skip)
@@ -332,7 +432,6 @@ const getRestaurantOrders = asyncHandler(async (req, res) => {
 // ==================== UPDATE ORDER STATUS ====================
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
-
     const { id } = req.params;
     const { status } = req.body;
 
@@ -391,8 +490,21 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 
     order.status = status;
-
     await order.save();
+
+    // Emit Socket.IO event
+    const io = req.app.get("io");
+    if (io) {
+        io.to(`order:${order._id}`).emit("order:status", {
+            orderId: order._id,
+            status: order.status,
+            updatedAt: order.updatedAt
+        });
+        io.to(`restaurant:${order.restaurant}`).emit("order:status", {
+            orderId: order._id,
+            status: order.status
+        });
+    }
 
     return res.status(200).json(
         new ApiResponse(

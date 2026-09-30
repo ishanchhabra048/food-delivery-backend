@@ -9,12 +9,25 @@ const restaurantSchema = new mongoose.Schema(
         },
 
         description: {
-            type: String
+            type: String,
+            trim: true
+        },
+
+        cuisine: {
+            type: String,
+            trim: true,
+            default: ""
         },
 
         address: {
             type: String,
-            required: true
+            required: true,
+            trim: true
+        },
+
+        image: {
+            url: { type: String, default: "" },
+            publicId: { type: String, default: "" }
         },
 
         owner: {
@@ -33,9 +46,6 @@ const restaurantSchema = new mongoose.Schema(
     }
 );
 
-const Restaurant = mongoose.model(
-    "Restaurant",
-    restaurantSchema
-);
+const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 
 module.exports = Restaurant;

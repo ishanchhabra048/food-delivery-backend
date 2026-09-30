@@ -1,10 +1,18 @@
 require("dotenv").config();
-
+const http = require("http");
+const { Server } = require("socket.io");
 const app = require("./app");
 const connectDB = require("./db/database");
 const { redisClient } = require("./config/redis");
+const setupSockets = require("./sockets");
+const { startCronJobs } = require("./cron");
+const logger = require("./utils/logger");
 
 const PORT = process.env.PORT || 5000;
+
+const allowedOrigins = process.env.CLIENT_ORIGINS
+    ? process.env.CLIENT_ORIGINS.split(",").map((s) => s.trim())
+    : ["http://localhost:5173", "http://localhost:3000"];
 
 const startServer = async () => {
     try {
@@ -13,28 +21,46 @@ const startServer = async () => {
         // Connect Redis with graceful fallback if Redis is offline
         try {
             await redisClient.connect();
-            console.log("Redis connected successfully.");
+            logger.info("Redis connected successfully.");
         } catch (redisError) {
-            console.warn("⚠️ Redis connection failed:", redisError.message);
-            console.warn("Server starting in fallback mode (Redis cache disabled).");
+            logger.warn({ error: redisError.message }, "Redis connection failed. Starting in fallback mode.");
         }
 
-        const server = app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
+        const httpServer = http.createServer(app);
+
+        const io = new Server(httpServer, {
+            cors: {
+                origin: (origin, callback) => {
+                    if (!origin) return callback(null, true);
+                    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+                        return callback(null, true);
+                    }
+                    return callback(null, true);
+                },
+                credentials: true
+            }
+        });
+
+        setupSockets(io);
+        app.set("io", io);
+
+        // Start cron schedules
+        startCronJobs();
+
+        const server = httpServer.listen(PORT, () => {
+            logger.info(`Server running on port ${PORT}`);
         });
 
         server.on("error", (err) => {
             if (err.code === "EADDRINUSE") {
-                console.error(`❌ Port ${PORT} is already in use by another process.`);
-                console.error(`Please kill the process using port ${PORT} or change PORT in .env.`);
+                logger.error(`Port ${PORT} is already in use by another process.`);
             } else {
-                console.error("Server error:", err.message);
+                logger.error({ error: err.message }, "Server error");
             }
             process.exit(1);
         });
-    }
-    catch (error) {
-        console.error("Server failed to start:", error.message);
+    } catch (error) {
+        logger.error({ error: error.message }, "Server failed to start");
         process.exit(1);
     }
 };

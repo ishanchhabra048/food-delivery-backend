@@ -3,18 +3,23 @@ const ApiError = require("../utils/ApiError");
 const ApiResponse = require("../utils/ApiResponse");
 const Restaurant = require("../models/restaurant.model");
 const { clearRestaurantCache, getCache, setCache } = require("../utils/cache");
+const { getPagination, getSort } = require("../utils/paginate");
 
 const createRestaurant = asyncHandler(async (req, res) => {
-    const { name, description, address, isOpen } = req.body;
+    const { name, description, address, cuisine, image, isOpen } = req.body;
 
     if (!name || !address) {
         throw new ApiError(400, "Restaurant name and address are required");
     }
 
+    const formattedImage = typeof image === "string" ? { url: image, publicId: "" } : (image || { url: "", publicId: "" });
+
     const restaurant = await Restaurant.create({
         name,
         description,
+        cuisine: cuisine || "",
         address,
+        image: formattedImage,
         owner: req.user._id,
         isOpen: isOpen !== undefined ? isOpen : true
     });
@@ -30,10 +35,8 @@ const createRestaurant = asyncHandler(async (req, res) => {
     );
 });
 
-const { getPagination, getSort } = require("../utils/paginate");
-
 const getAllRestaurants = asyncHandler(async (req, res) => {
-    const { page, limit, search, isOpen, sortBy, sortOrder } = req.query;
+    const { page, limit, search, cuisine, category, isOpen, sortBy, sortOrder } = req.query;
 
     // 1. Create unique cache key
     const cacheKey = `restaurants:${JSON.stringify(req.query)}`;
@@ -67,6 +70,12 @@ const getAllRestaurants = asyncHandler(async (req, res) => {
         filter.name = { $regex: search, $options: "i" };
     }
 
+    // Filter by cuisine/category
+    const cuisineFilter = cuisine || category;
+    if (cuisineFilter && cuisineFilter !== "All") {
+        filter.cuisine = { $regex: cuisineFilter, $options: "i" };
+    }
+
     // Filter by open/closed status
     if (isOpen !== undefined) {
         filter.isOpen = isOpen === "true";
@@ -76,6 +85,7 @@ const getAllRestaurants = asyncHandler(async (req, res) => {
     const [totalDocs, restaurants] = await Promise.all([
         Restaurant.countDocuments(filter),
         Restaurant.find(filter)
+            .populate("owner", "fullName email")
             .sort(sort)
             .skip(skip)
             .limit(Number(limit) || 10)
@@ -102,42 +112,47 @@ const getAllRestaurants = asyncHandler(async (req, res) => {
 
 const getRestaurantById = asyncHandler(async(req,res)=>{
    const {id} = req.params;
-   const restaurant = await Restaurant.findById(id);
+   const restaurant = await Restaurant.findById(id).populate("owner", "fullName email");
    if(!restaurant){
-    throw new ApiError(404,"Restaurant not found")
+    throw new ApiError(404,"Restaurant not found");
    }
    return res.status(200).json(
     new ApiResponse(200, "Restaurant fetched successfully", restaurant)
-   )
+   );
 });
 
 const updateRestaurant = asyncHandler(async(req,res)=>{
   const {id} = req.params;
-  const {name,description,address,isOpen} = req.body;
+  const {name,description,address,cuisine,image,isOpen} = req.body;
   
   const restaurant = await Restaurant.findById(id);
   if(!restaurant){
-    throw new ApiError(404,"Restaurant not found")
+    throw new ApiError(404,"Restaurant not found");
   }
 
   if(restaurant.owner.toString() !== req.user._id.toString()){
     throw new ApiError(403,"You are not authorized to update this restaurant");
   }
 
+  const updateFields = {
+    name,
+    description,
+    address,
+    cuisine,
+    isOpen
+  };
 
+  if (image !== undefined) {
+    updateFields.image = typeof image === "string" ? { url: image, publicId: "" } : image;
+  }
 
   const updatedRestaurant = await Restaurant.findByIdAndUpdate(
     id,
     {
-      $set:{
-        name,
-        description,
-        address,
-        isOpen
-      }
+      $set: updateFields
     },
     {
-      new:true
+      new: true
     }
   );
 
@@ -149,7 +164,6 @@ const updateRestaurant = asyncHandler(async(req,res)=>{
 });
 
 const deleteRestaurant = asyncHandler(async (req, res) => {
-
     const { id } = req.params;
 
     const restaurant = await Restaurant.findById(id);

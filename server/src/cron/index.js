@@ -1,7 +1,12 @@
 const cron = require("node-cron");
+const logger = require("../utils/logger");
 
-cron.schedule("* * * * *", () => {
-    console.log("Cron job executed:", new Date());
-});
+const startCronJobs = () => {
+    cron.schedule("*/15 * * * *", () => {
+        logger.info({ timestamp: new Date().toISOString() }, "Cron heartbeat executed");
+    });
 
-console.log("Cron scheduler started...");
+    logger.info("Cron scheduler started...");
+};
+
+module.exports = { startCronJobs };
