@@ -24,17 +24,17 @@ export const Button = React.forwardRef(
 
     const variants = {
       primary:
-        "bg-primary text-white hover:bg-primary-hover shadow-sm hover:shadow-md",
+        "bg-gradient-primary text-white font-semibold hover:opacity-95 shadow-sm hover:shadow-glow hover:-translate-y-0.5",
       secondary:
-        "bg-secondary text-white hover:bg-secondary-hover shadow-sm hover:shadow-md",
+        "bg-gradient-emerald text-white font-semibold hover:opacity-95 shadow-sm hover:-translate-y-0.5",
       outline:
-        "border border-border bg-surface text-fg hover:bg-surface-muted hover:border-text-3/40",
+        "border-2 border-border bg-surface text-fg font-semibold hover:bg-surface-muted hover:border-primary/40",
       ghost:
-        "text-fg-2 hover:text-fg hover:bg-surface-muted",
+        "text-fg-2 font-medium hover:text-fg hover:bg-surface-muted",
       danger:
-        "bg-danger text-white hover:bg-red-600 shadow-sm",
+        "bg-danger text-white font-semibold hover:bg-red-600 shadow-sm",
       accent:
-        "bg-gradient-to-r from-[#FF5A1F] to-[#FF2D78] text-white shadow-sm hover:opacity-95",
+        "bg-gradient-accent text-white font-semibold shadow-sm hover:shadow-glow-accent hover:-translate-y-0.5",
     };
 
     const sizes = {

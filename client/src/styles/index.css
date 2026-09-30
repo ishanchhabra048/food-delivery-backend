@@ -3,19 +3,35 @@
 @tailwind utilities;
 
 :root {
-  --bg: #FFFBF7;
+  /* High-contrast, vibrant, modern aesthetic palette */
+  --bg: #F8FAFC;
   --surface: #FFFFFF;
-  --surface-muted: #FFF3EA;
-  --border: #F0E4D8;
-  --text: #231A14;
-  --text-2: #6B5A4E;
-  --text-3: #A6968A;
-  --primary: #FF5A1F;
-  --secondary: #16A34A;
-  --accent: #FF2D78;
+  --surface-muted: #F1F5F9;
+  --border: #E2E8F0;
+  --border-focus: #FF4B26;
+  
+  /* Rich high-contrast typography */
+  --text: #0F172A;
+  --text-2: #334155;
+  --text-3: #64748B;
+  
+  /* Electric Vibrant Accents */
+  --primary: #FF4B26;
+  --primary-hover: #E03512;
+  --secondary: #10B981;
+  --secondary-hover: #059669;
+  --accent: #8B5CF6;
+  --accent-hover: #7C3AED;
   --warning: #F59E0B;
   --danger: #EF4444;
-  --gradient-warm: linear-gradient(135deg, #FF5A1F 0%, #FF2D78 100%);
+
+  /* Aesthetic Modern Gradients */
+  --gradient-primary: linear-gradient(135deg, #FF4B26 0%, #FF1361 100%);
+  --gradient-accent: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  --gradient-emerald: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+  --gradient-hero: radial-gradient(circle at top center, rgba(255, 75, 38, 0.15), transparent 70%),
+                   radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12), transparent 50%),
+                   radial-gradient(circle at 20% 40%, rgba(16, 185, 129, 0.10), transparent 50%);
 }
 
 @layer base {
@@ -25,10 +41,53 @@
   body {
     background-color: var(--bg);
     color: var(--text);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+  .bg-gradient-accent {
+    background-image: var(--gradient-accent);
+  }
+  .bg-gradient-emerald {
+    background-image: var(--gradient-emerald);
+  }
+  .text-gradient {
+    background-image: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .text-gradient-accent {
+    background-image: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .glass {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+  .glass-dark {
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .glow-primary {
+    box-shadow: 0 10px 30px -5px rgba(255, 75, 38, 0.35);
+  }
+  .glow-accent {
+    box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.35);
   }
 }
 
@@ -43,12 +102,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-3);
+  background: #94A3B8;
 }
 
 /* Focus styles */

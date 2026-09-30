@@ -76,12 +76,12 @@ export const Navbar = () => {
           {/* Cart Button with spring counter bump */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative p-2.5 rounded-full bg-surface-muted hover:bg-border/60 text-fg transition-transform active:scale-90"
+            className="relative p-2.5 rounded-full bg-surface-muted hover:bg-border/60 text-fg transition-all hover:scale-105 active:scale-95"
             aria-label="View Cart"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-5 h-5 text-fg" />
             {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-[11px] font-bold rounded-full flex items-center justify-center animate-in zoom-in-50 duration-200 shadow-sm">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-primary text-white text-[11px] font-extrabold rounded-full flex items-center justify-center animate-in zoom-in-50 duration-200 shadow-glow">
                 {itemCount}
               </span>
             )}

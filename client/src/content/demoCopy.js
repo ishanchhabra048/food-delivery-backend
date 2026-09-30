@@ -1,9 +1,9 @@
 export const demoCopy = {
   hero: {
-    badge: "⚡ Superfast 30-Min Delivery",
-    headline: "Crave it? Get it hot & fresh from local kitchens.",
-    subheadline: "Explore artisan pizzas, slow-simmered biryanis, authentic ramen, and juicy smash burgers delivered right to your table.",
-    searchPlaceholder: "Search restaurant names or food dishes...",
+    badge: "⚡ Superfast 30-Min Delivery • Fresh & Piping Hot",
+    headline: "Crave it? Get authentic, hot & delicious meals delivered.",
+    subheadline: "Explore artisan pizzas, aromatic dum biryanis, fresh homemade tiffins, and handcrafted dishes delivered straight to your door.",
+    searchPlaceholder: "Search restaurants, dishes, or homemade tiffins...",
   },
   emptyStates: {
     cart: {

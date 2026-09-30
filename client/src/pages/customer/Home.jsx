@@ -59,36 +59,36 @@ export const Home = () => {
       />
 
       {/* Hero Section */}
-      <section className="container max-w-[1180px] mx-auto px-4 pt-12 pb-16 text-center relative z-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-muted border border-border text-xs font-semibold text-primary mb-6 shadow-sm">
-          <Sparkles className="w-4 h-4 text-accent" />
+      <section className="container max-w-[1180px] mx-auto px-4 pt-14 pb-16 text-center relative z-10">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-primary/20 text-xs font-bold text-primary mb-6 shadow-sm backdrop-blur-md">
+          <Sparkles className="w-4 h-4 text-accent animate-spin-slow" />
           <span>{demoCopy.hero.badge}</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-fg tracking-tight max-w-3xl mx-auto leading-[1.15]">
-          {demoCopy.hero.headline}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-black text-fg tracking-tight max-w-3xl mx-auto leading-[1.12]">
+          Crave it? Get <span className="text-gradient">hot & fresh meals</span> delivered.
         </h1>
 
-        <p className="text-sm sm:text-base md:text-lg text-fg-2 max-w-2xl mx-auto mt-4 leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-fg-2 max-w-2xl mx-auto mt-4 font-medium leading-relaxed">
           {demoCopy.hero.subheadline}
         </p>
 
         {/* Hero Search Bar */}
         <form
           onSubmit={handleSearchSubmit}
-          className="mt-8 max-w-xl mx-auto flex items-center bg-surface border-2 border-border focus-within:border-primary rounded-full p-1.5 shadow-card transition-all duration-200"
+          className="mt-8 max-w-xl mx-auto flex items-center bg-white/95 backdrop-blur-md border-2 border-border focus-within:border-primary focus-within:shadow-glow rounded-full p-2 shadow-card transition-all duration-300"
         >
           <div className="pl-4 text-fg-3">
-            <Search className="w-5 h-5" />
+            <Search className="w-5 h-5 text-primary" />
           </div>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={demoCopy.hero.searchPlaceholder}
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-fg placeholder:text-fg-3 focus:outline-none"
+            className="flex-1 bg-transparent px-3 py-2 text-sm font-medium text-fg placeholder:text-fg-3 focus:outline-none"
           />
-          <Button type="submit" variant="primary" size="md" className="rounded-full px-6">
+          <Button type="submit" variant="primary" size="md" className="rounded-full px-7">
             Search
           </Button>
         </form>

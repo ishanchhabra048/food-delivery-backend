@@ -26,8 +26,8 @@ export const CategoryPills = ({
             className={cn(
               "relative px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 shrink-0",
               isActive
-                ? "bg-gradient-to-r from-primary to-accent text-white shadow-sm scale-105"
-                : "bg-surface text-fg-2 border border-border hover:border-primary/40 hover:text-fg hover:bg-surface-muted"
+                ? "bg-gradient-primary text-white shadow-glow scale-105"
+                : "bg-surface text-fg-2 border border-border hover:border-primary/40 hover:text-fg hover:bg-surface-muted hover:shadow-sm"
             )}
           >
             {cat.name}
