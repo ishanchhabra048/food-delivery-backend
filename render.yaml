@@ -3,7 +3,7 @@ services:
   - type: web
     name: food-delivery-api
     runtime: node
-    plan: starter # Starter plan recommended for WebSockets support and persistent connection
+    plan: starter
     rootDir: server
     buildCommand: npm install
     startCommand: npm run start
@@ -14,40 +14,34 @@ services:
         value: production
       - key: PORT
         value: 10000
-      - key: MONGO_URI
-        sync: false # Set in Render Dashboard with your MongoDB Atlas URI
-      - key: JWT_SECRET
-        generateValue: true
-      - key: ACCESS_TOKEN_SECRET
-        generateValue: true
-      - key: REFRESH_TOKEN_SECRET
-        generateValue: true
-      - key: ACCESS_TOKEN_EXPIRY
-        value: 1d
-      - key: REFRESH_TOKEN_EXPIRY
-        value: 10d
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
       - key: CLIENT_ORIGINS
-        sync: false # Set to your Vercel URL e.g. https://food-delivery-app.vercel.app
+        sync: false
       - key: REDIS_URL
-        sync: false # Upstash or Render Redis URL (optional)
+        sync: false
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-      - key: EMAIL_HOST
-        value: smtp.ethereal.email
-      - key: EMAIL_PORT
-        value: 587
       - key: EMAIL_USER
         sync: false
-      - key: EMAIL_PASS
+      - key: EMAIL_PASSWORD
         sync: false
-      - key: EMAIL_FROM
-        value: noreply@anyfeast.com
+      - key: CASHFREE_CLIENT_ID
+        sync: false
+      - key: CASHFREE_CLIENT_SECRET
+        sync: false
+      - key: CASHFREE_API_VERSION
+        value: 2025-01-01
 
-  # 2. BullMQ Email Background Worker
+  # 2. BullMQ Background Worker
   - type: worker
     name: food-delivery-worker
     runtime: node
@@ -59,29 +53,23 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGO_URI
+      - key: MONGODB_URI
         fromService:
           type: web
           name: food-delivery-api
-          envVarKey: MONGO_URI
+          envVarKey: MONGODB_URI
       - key: REDIS_URL
         fromService:
           type: web
           name: food-delivery-api
           envVarKey: REDIS_URL
-      - key: EMAIL_HOST
-        value: smtp.ethereal.email
-      - key: EMAIL_PORT
-        value: 587
       - key: EMAIL_USER
         fromService:
           type: web
           name: food-delivery-api
           envVarKey: EMAIL_USER
-      - key: EMAIL_PASS
+      - key: EMAIL_PASSWORD
         fromService:
           type: web
           name: food-delivery-api
-          envVarKey: EMAIL_PASS
-      - key: EMAIL_FROM
-        value: noreply@anyfeast.com
+          envVarKey: EMAIL_PASSWORD
