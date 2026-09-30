@@ -1,0 +1,17 @@
+{
+  "name": "food-delivery-platform",
+  "version": "1.0.0",
+  "description": "Full-stack food delivery platform with live Socket.IO tracking, multi-role dashboards, and Cashfree payments",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run worker --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev:worker": "npm run worker --prefix server",
+    "seed": "npm run seed --prefix server",
+    "test": "npm run test --prefix server",
+    "build": "npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

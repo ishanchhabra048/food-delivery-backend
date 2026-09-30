@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" fill="none">
+  <rect width="400" height="300" fill="#FFF3EA"/>
+  <circle cx="200" cy="130" r="48" fill="#F0E4D8"/>
+  <path d="M185 130v25h30v-25M175 115h50v8h-50zM200 95l35 20h-70z" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="200" y="210" fill="#6B5A4E" font-family="Inter, sans-serif" font-size="16" font-weight="600" text-anchor="middle">Restaurant Image</text>
+</svg>
