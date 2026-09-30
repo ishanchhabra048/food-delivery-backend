@@ -1,6 +1,6 @@
 export const siteConfig = {
-  name: "AnyFeast",
-  tagline: "Vibrant meals delivered straight to your door",
+  name: "Tiffino",
+  tagline: "Fresh, homemade & restaurant tiffins delivered to your door",
   description: "Order delicious food from the finest local kitchens and restaurants with fast live delivery tracking.",
   nav: {
     customer: [

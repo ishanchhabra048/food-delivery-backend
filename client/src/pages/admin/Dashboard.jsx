@@ -108,7 +108,7 @@ export const AdminDashboard = () => {
             Partner Applications
           </h3>
           <p className="text-xs text-fg-2 leading-relaxed">
-            Review incoming requests from registered customers wanting to list their kitchens on AnyFeast.
+            Review incoming requests from registered customers wanting to list their kitchens on Tiffino.
           </p>
           <Button to="/admin/owner-requests" variant="primary" size="md" iconRight={ArrowRight}>
             Open Review Queue ({stats?.pendingOwnerRequests || 0})

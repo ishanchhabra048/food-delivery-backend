@@ -76,7 +76,7 @@ export const AdminUsers = () => {
     <div className="space-y-6">
       <PageHeader
         title="User Directory"
-        subtitle="Manage customer, restaurant owner, and administrator accounts registered on AnyFeast."
+        subtitle="Manage customer, restaurant owner, and administrator accounts registered on Tiffino."
       />
 
       {/* Filters */}

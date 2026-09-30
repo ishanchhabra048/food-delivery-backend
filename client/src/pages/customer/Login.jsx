@@ -60,12 +60,12 @@ export const Login = () => {
           <Link to="/" className="inline-flex items-center gap-2 mb-2">
             <span className="text-3xl">🍽️</span>
             <span className="font-display font-bold text-2xl text-fg">
-              Any<span className="text-primary">Feast</span>
+              Tiff<span className="text-primary">ino</span>
             </span>
           </Link>
           <h2 className="text-2xl font-bold font-display text-fg">Welcome Back</h2>
           <p className="text-xs text-fg-2">
-            Sign in to manage your feasts, track orders, and order delicious food.
+            Sign in to order fresh meals, track tiffins, and manage your kitchen.
           </p>
         </div>
 

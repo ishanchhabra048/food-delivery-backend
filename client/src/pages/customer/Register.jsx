@@ -46,7 +46,7 @@ export const Register = () => {
 
       // Auto-login after registration
       await login(data.email, data.password);
-      toast.success("Account created successfully! Welcome to AnyFeast.");
+      toast.success("Account created successfully! Welcome to Tiffino.");
       navigate("/");
     } catch (err) {
       toast.error(err.message || "Registration failed");
@@ -60,12 +60,12 @@ export const Register = () => {
           <Link to="/" className="inline-flex items-center gap-2 mb-2">
             <span className="text-3xl">🍽️</span>
             <span className="font-display font-bold text-2xl text-fg">
-              Any<span className="text-primary">Feast</span>
+              Tiff<span className="text-primary">ino</span>
             </span>
           </Link>
           <h2 className="text-2xl font-bold font-display text-fg">Create Account</h2>
           <p className="text-xs text-fg-2">
-            Join AnyFeast to order hot meals and track live delivery.
+            Join Tiffino to order fresh meals and track live delivery.
           </p>
         </div>
 

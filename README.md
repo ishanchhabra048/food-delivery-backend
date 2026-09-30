@@ -1,6 +1,6 @@
-# AnyFeast - Full-Stack Food Delivery Platform
+# Tiffino - Full-Stack Food & Tiffin Delivery Platform
 
-A production-grade, full-stack food delivery web application with real-time Socket.IO status tracking, role-based dashboards (Customer, Restaurant Owner, Admin), Cloudinary asset uploads, atomic MongoDB transactions, and Cashfree payment integration.
+A production-grade, full-stack food and tiffin delivery web application with real-time Socket.IO status tracking, role-based dashboards (Customer, Restaurant Owner, Admin), Cloudinary asset uploads, atomic MongoDB transactions, and Cashfree payment integration.
 
 ---
 

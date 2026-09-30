@@ -40,7 +40,7 @@ export const Navbar = () => {
               🍽️
             </div>
             <span className="font-display font-bold text-xl tracking-tight text-fg">
-              Any<span className="text-primary">Feast</span>
+              Tiff<span className="text-primary">ino</span>
             </span>
           </Link>
 

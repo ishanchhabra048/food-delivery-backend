@@ -10,11 +10,11 @@ export const Footer = () => {
             <div className="flex items-center gap-2">
               <span className="text-2xl">🍽️</span>
               <span className="font-display font-bold text-xl text-fg">
-                Any<span className="text-primary">Feast</span>
+                Tiff<span className="text-primary">ino</span>
               </span>
             </div>
             <p className="text-xs text-fg-2 leading-relaxed">
-              Bringing the freshest, most vibrant gourmet dishes from top local kitchens straight to your doorstep in minutes.
+              Bringing fresh, homemade meals and restaurant delicacies straight to your doorstep in minutes.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ export const Footer = () => {
             <ul className="space-y-2 text-xs text-fg-2">
               <li>
                 <Link to="/profile?tab=partner" className="hover:text-primary transition-colors">
-                  Partner with AnyFeast
+                  Partner with Tiffino
                 </Link>
               </li>
               <li>
@@ -77,7 +77,7 @@ export const Footer = () => {
               Cashfree secured payments, instant live order tracking via WebSockets, and contact-free delivery options.
             </p>
             <div className="mt-3 text-[11px] text-fg-3">
-              © {new Date().getFullYear()} AnyFeast Platform. All rights reserved.
+              © {new Date().getFullYear()} Tiffino Platform. All rights reserved.
             </div>
           </div>
         </div>

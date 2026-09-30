@@ -224,10 +224,10 @@ export const Profile = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5" /> Partner with AnyFeast
+                <Sparkles className="w-3.5 h-3.5" /> Partner with Tiffino
               </div>
               <h3 className="text-xl font-bold font-display text-fg">
-                Become a Restaurant Partner
+                Become a Restaurant / Tiffin Partner
               </h3>
               <p className="text-xs sm:text-sm text-fg-2 leading-relaxed">
                 Reach thousands of hungry food lovers across the city. List your kitchen, customize your menu items, and manage live incoming orders.
