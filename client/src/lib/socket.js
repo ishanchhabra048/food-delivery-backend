@@ -4,7 +4,18 @@ let socketInstance = null;
 
 export const getSocket = () => {
   if (!socketInstance) {
-    socketInstance = io(window.location.origin, {
+    let serverUrl = window.location.origin;
+    if (import.meta.env.VITE_SOCKET_URL) {
+      serverUrl = import.meta.env.VITE_SOCKET_URL;
+    } else if (import.meta.env.VITE_API_BASE_URL && import.meta.env.VITE_API_BASE_URL.startsWith("http")) {
+      try {
+        serverUrl = new URL(import.meta.env.VITE_API_BASE_URL).origin;
+      } catch (e) {
+        serverUrl = window.location.origin;
+      }
+    }
+
+    socketInstance = io(serverUrl, {
       withCredentials: true,
       autoConnect: false,
       transports: ["websocket", "polling"],

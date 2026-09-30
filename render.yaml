@@ -1,0 +1,87 @@
+services:
+  # 1. Express API Web Service (with Socket.IO)
+  - type: web
+    name: food-delivery-api
+    runtime: node
+    plan: starter # Starter plan recommended for WebSockets support and persistent connection
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false # Set in Render Dashboard with your MongoDB Atlas URI
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_SECRET
+        generateValue: true
+      - key: REFRESH_TOKEN_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRY
+        value: 1d
+      - key: REFRESH_TOKEN_EXPIRY
+        value: 10d
+      - key: CLIENT_ORIGINS
+        sync: false # Set to your Vercel URL e.g. https://food-delivery-app.vercel.app
+      - key: REDIS_URL
+        sync: false # Upstash or Render Redis URL (optional)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: EMAIL_HOST
+        value: smtp.ethereal.email
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: EMAIL_FROM
+        value: noreply@anyfeast.com
+
+  # 2. BullMQ Email Background Worker
+  - type: worker
+    name: food-delivery-worker
+    runtime: node
+    plan: starter
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm run worker
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        fromService:
+          type: web
+          name: food-delivery-api
+          envVarKey: MONGO_URI
+      - key: REDIS_URL
+        fromService:
+          type: web
+          name: food-delivery-api
+          envVarKey: REDIS_URL
+      - key: EMAIL_HOST
+        value: smtp.ethereal.email
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        fromService:
+          type: web
+          name: food-delivery-api
+          envVarKey: EMAIL_USER
+      - key: EMAIL_PASS
+        fromService:
+          type: web
+          name: food-delivery-api
+          envVarKey: EMAIL_PASS
+      - key: EMAIL_FROM
+        value: noreply@anyfeast.com
